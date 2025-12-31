@@ -1,14 +1,17 @@
 ﻿using System.Text.Json;
 using System.Text;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using TestingOllamaLLM.Models;
 
 namespace TestingOllamaLLM
 {
     public abstract class BaseClass
     {
         private readonly HttpClient _httpClient = new HttpClient();
+        private HttpResponseMessage _response;
+        private string _responseText;
 
-        public async Task<string> CreateRequestForOllama(string promptMessage)
+        public async Task CreateRequestForOllama(string promptMessage)
         {
             var requestBody = new
             {
@@ -20,26 +23,37 @@ namespace TestingOllamaLLM
             var json = JsonSerializer.Serialize(requestBody);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("http://localhost:11434/api/generate", content);
-            response.EnsureSuccessStatusCode();
+            _response = await _httpClient.PostAsync("http://localhost:11434/api/generate", content);
+            _response.EnsureSuccessStatusCode();
 
-            var responseText = await response.Content.ReadAsStringAsync();
+            var responseText = await _response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<OllamaResponse>(responseText);
 
-            using var doc = JsonDocument.Parse(responseText);
-            string output = doc.RootElement.GetProperty("response").GetString();
-
-            return output;
+            _responseText = result.response; // ✅ store internally
         }
 
-        public void CheckResponseContent(string responseText, string expectedValue)
+        public void CheckResponseStatusCode()
         {
-            if (!responseText.ToLower().Contains(expectedValue.ToLower()))
-            {
-                throw new Exception($"Test failed: expected '{expectedValue}' not found in response.");
-            }
+            if (_response == null)
+                throw new InvalidOperationException("No request was made.");
 
-            Console.WriteLine("✅ Test passed");
+            if (!_response.IsSuccessStatusCode)
+                throw new Exception($"Request failed with status {_response.StatusCode}");
+
+            Console.WriteLine("✅ HTTP status OK");
         }
-    }
 
+        public void CheckResponseContent(string expectedValue)
+        {
+            if (string.IsNullOrEmpty(_responseText))
+                throw new InvalidOperationException("No response content available.");
+
+            if (!_responseText.ToLower().Contains(expectedValue.ToLower()))
+                throw new Exception($"Test failed: expected '{expectedValue}' not found.");
+
+            Console.WriteLine("✅ Content validation passed");
+        }
+
+
+    }
 }
