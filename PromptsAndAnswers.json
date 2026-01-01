@@ -1,0 +1,18 @@
+[
+  {
+    "Question": "Who is the current US president?",
+    "ExpectedAnswer": "Joe Biden"
+  },
+  {
+    "Question": "What is the capital of Greece?",
+    "ExpectedAnswer": "Athens"
+  },
+  {
+    "Question": "What is 2 + 2?",
+    "ExpectedAnswer": "4"
+  },
+  {
+    "Question": "What is the capital of Turkey?",
+    "ExpectedAnswer": "Ankara"
+  }
+]

@@ -9,6 +9,7 @@ namespace TestingOllamaLLM.Basics
         private readonly HttpClient _httpClient = new HttpClient();
         private HttpResponseMessage _response;
         private string _responseText;
+        private TestData _testData;
 
         protected async Task CreateRequestForOllama(string promptMessage)
         {
@@ -58,6 +59,29 @@ namespace TestingOllamaLLM.Basics
                 throw new InvalidOperationException("No response content available.");
             Assert.DoesNotContain(expectedValue.ToLower(), _responseText.ToLower());
             Console.WriteLine("✅ Content is not contained");
+        }
+
+        public static IEnumerable<object[]> GetTestData()
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(),"PromptsAndAnswers.json");
+
+            var json = File.ReadAllText(filePath);
+            var data = JsonSerializer.Deserialize<List<TestData>>(json);
+
+            foreach (var item in data)
+            {
+                yield return new object[] { item.Question, item.ExpectedAnswer };
+            }
+        }
+
+        protected async Task CreateRequestForFile()
+        {
+            CreateRequestForOllama(_testData.Question);
+        }
+
+        protected async Task CheckResponseFromFile()
+        {
+            CheckResponseContent(_testData.ExpectedAnswer);
         }
 
 
