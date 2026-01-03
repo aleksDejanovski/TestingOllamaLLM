@@ -49,8 +49,6 @@ namespace TestingOllamaLLM.Basics
             if (string.IsNullOrEmpty(_responseText))
                 throw new InvalidOperationException("No response content available.");
             Assert.Contains(expectedValue.ToLower(), _responseText.ToLower());
-
-            Console.WriteLine("✅ Content validation passed");
         }
 
         protected void CheckResponseContentDoesNotHave(string expectedValue)
@@ -58,7 +56,6 @@ namespace TestingOllamaLLM.Basics
             if (string.IsNullOrEmpty(_responseText))
                 throw new InvalidOperationException("No response content available.");
             Assert.DoesNotContain(expectedValue.ToLower(), _responseText.ToLower());
-            Console.WriteLine("✅ Content is not contained");
         }
 
         public static IEnumerable<object[]> GetTestData()
@@ -76,14 +73,13 @@ namespace TestingOllamaLLM.Basics
 
         protected async Task CreateRequestForFile()
         {
-            CreateRequestForOllama(_testData.Question);
+           await CreateRequestForOllama(_testData.Question);
         }
 
         protected async Task CheckResponseFromFile()
         {
-            CheckResponseContent(_testData.ExpectedAnswer);
+           CheckResponseContent(_testData.ExpectedAnswer);
         }
-
 
     }
 }

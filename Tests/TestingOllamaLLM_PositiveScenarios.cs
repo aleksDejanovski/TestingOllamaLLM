@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using System.Text;
-using TestingOllamaLLM.Basics;
+﻿using TestingOllamaLLM.Basics;
 
 namespace TestingOllamaLLM.Tests
 {
@@ -60,6 +58,24 @@ namespace TestingOllamaLLM.Tests
             await CreateRequestForOllama("Why is paracetamol used? Give Short answer");
             CheckResponseStatusCode(200);
             CheckResponseContent("pain");
+        }
+
+        [Fact]
+        public async Task CheckStarWarsMovies()
+        {
+            await CreateRequestForOllama("How many parts has the movie Star Wars. Give answer in a list starting from 1. Be short and dont give explanations. Give only the name of the movies.");
+            CheckResponseStatusCode(200);
+            CheckResponseContent("The Empire Strikes Back");
+            CheckResponseContent("The Phantom Menace");
+            CheckResponseContentDoesNotHave("Star Trek");
+        }
+        [Fact]
+        public async Task CheckTennisPlayer()
+        {
+            await CreateRequestForOllama("which tennis playes has the most grand slams. Give me just his name not his surname?");
+            CheckResponseStatusCode(200);
+            CheckResponseContent("Novak");
+            CheckResponseContentDoesNotHave("Djokovic");
         }
     }
 }
